@@ -239,6 +239,9 @@ const elements = {
   audioRemaining: document.querySelector("#audioRemaining"),
   audioSeek: document.querySelector("#audioSeek"),
   audioSpeed: document.querySelector("#audioSpeed"),
+  audioMinimize: document.querySelector("#audioMinimize"),
+  audioRestore: document.querySelector("#audioRestore"),
+  audioRestoreTitle: document.querySelector("#audioRestoreTitle"),
 };
 
 function getChapterDetails(index) {
@@ -658,6 +661,7 @@ function syncAudioChapter(index, autoplay = false) {
   elements.chapterAudio.src = audiobookTracks[index].url;
   elements.audioChapterNumber.textContent = `Chapter ${index + 1}`;
   elements.audioChapterTitle.textContent = chapters[index];
+  elements.audioRestoreTitle.textContent = chapters[index];
   elements.audioPrevious.disabled = index === 0;
   elements.audioNext.disabled = index === chapters.length - 1;
   elements.audioSeek.value = "0";
@@ -689,8 +693,23 @@ function toggleAudiobook() {
 
 function setAudioPlaying(isPlaying) {
   elements.audioPlayer.classList.toggle("playing", isPlaying);
+  elements.audioRestore.classList.toggle("playing", isPlaying);
   elements.readerListenButton.classList.toggle("playing", isPlaying);
   elements.audioPlay.setAttribute("aria-label", isPlaying ? "Pause audiobook" : "Play audiobook");
+}
+
+function setAudioCollapsed(isCollapsed, moveFocus = true) {
+  elements.body.classList.toggle("audio-collapsed", isCollapsed);
+  elements.audioPlayer.setAttribute("aria-hidden", String(isCollapsed));
+  elements.audioPlayer.inert = isCollapsed;
+  elements.audioRestore.setAttribute("aria-hidden", String(!isCollapsed));
+  localStorage.setItem("da-audio-collapsed", String(isCollapsed));
+  if (!moveFocus) return;
+  if (isCollapsed) {
+    elements.audioRestore.focus();
+  } else {
+    elements.audioMinimize.focus();
+  }
 }
 
 function changeAudioChapter(delta) {
@@ -743,7 +762,12 @@ elements.shareBackdrop.addEventListener("click", (event) => {
 });
 elements.nativeShareButton.addEventListener("click", shareNatively);
 elements.copyShareLink.addEventListener("click", () => copyShareLink());
-elements.readerListenButton.addEventListener("click", toggleAudiobook);
+elements.readerListenButton.addEventListener("click", () => {
+  if (elements.body.classList.contains("audio-collapsed")) {
+    setAudioCollapsed(false);
+  }
+  toggleAudiobook();
+});
 elements.audioPlay.addEventListener("click", toggleAudiobook);
 elements.audioPrevious.addEventListener("click", () => changeAudioChapter(-1));
 elements.audioNext.addEventListener("click", () => changeAudioChapter(1));
@@ -755,6 +779,8 @@ elements.audioSpeed.addEventListener("change", () => {
   elements.chapterAudio.playbackRate = Number(elements.audioSpeed.value);
   localStorage.setItem("da-audio-speed", elements.audioSpeed.value);
 });
+elements.audioMinimize.addEventListener("click", () => setAudioCollapsed(true));
+elements.audioRestore.addEventListener("click", () => setAudioCollapsed(false));
 elements.chapterAudio.addEventListener("play", () => setAudioPlaying(true));
 elements.chapterAudio.addEventListener("pause", () => setAudioPlaying(false));
 elements.chapterAudio.addEventListener("timeupdate", updateAudioTimeline);
@@ -809,8 +835,10 @@ window.addEventListener("popstate", () => {
 const savedTheme = localStorage.getItem("da-theme");
 const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const savedAudioSpeed = localStorage.getItem("da-audio-speed") || "1";
+const savedAudioCollapsed = localStorage.getItem("da-audio-collapsed") === "true";
 elements.audioSpeed.value = savedAudioSpeed;
 elements.chapterAudio.playbackRate = Number(savedAudioSpeed);
+setAudioCollapsed(savedAudioCollapsed, false);
 setTheme(savedTheme ? savedTheme === "dark" : prefersDark);
 document.documentElement.style.setProperty("--reader-size", `${state.fontSize}px`);
 renderChapter();

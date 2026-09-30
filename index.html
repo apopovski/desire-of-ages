@@ -24,6 +24,12 @@
       <symbol id="icon-chevron-right" viewBox="0 0 24 24">
         <path d="m9 18 6-6-6-6" />
       </symbol>
+      <symbol id="icon-chevron-down" viewBox="0 0 24 24">
+        <path d="m6 9 6 6 6-6" />
+      </symbol>
+      <symbol id="icon-chevron-up" viewBox="0 0 24 24">
+        <path d="m6 15 6-6 6 6" />
+      </symbol>
       <symbol id="icon-bookmark" viewBox="0 0 24 24">
         <path d="M6 4.75A1.75 1.75 0 0 1 7.75 3h8.5A1.75 1.75 0 0 1 18 4.75V21l-6-3.5L6 21V4.75Z" />
       </symbol>
@@ -243,6 +249,9 @@
     </div>
     <section class="audio-player" id="audioPlayer" aria-label="The Desire of Ages audiobook">
       <audio id="chapterAudio" preload="metadata"></audio>
+      <button class="audio-minimize" id="audioMinimize" type="button" aria-label="Minimize audiobook player">
+        <svg><use href="#icon-chevron-down"></use></svg>
+      </button>
       <div class="audio-track-info">
         <span class="audio-art" aria-hidden="true">
           <svg><use href="#icon-headphones"></use></svg>
@@ -282,6 +291,16 @@
         </select>
       </label>
     </section>
+    <button class="audio-restore" id="audioRestore" type="button" aria-label="Show audiobook player">
+      <span class="audio-restore-icon">
+        <svg><use href="#icon-headphones"></use></svg>
+      </span>
+      <span>
+        <small>Audiobook</small>
+        <strong id="audioRestoreTitle">“God With Us”</strong>
+      </span>
+      <svg class="audio-restore-chevron"><use href="#icon-chevron-up"></use></svg>
+    </button>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <footer class="site-footer">
