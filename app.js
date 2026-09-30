@@ -198,6 +198,8 @@ const elements = {
   chapterSearch: document.querySelector("#chapterSearch"),
   chapterNumber: document.querySelector("#chapterNumber"),
   chapterTitle: document.querySelector("#chapterTitle"),
+  chapterPermalink: document.querySelector("#chapterPermalink"),
+  canonicalLink: document.querySelector("#canonicalLink"),
   chapterBody: document.querySelector("#chapterBody"),
   chapterCount: document.querySelector("#chapterCount"),
   previousButton: document.querySelector("#previousButton"),
@@ -317,12 +319,31 @@ function renderChapterList(query = "") {
     .join("");
 }
 
-function renderChapter({ scroll = false } = {}) {
+function getChapterPermalink(index) {
+  const url = new URL(window.location.href);
+  url.search = "";
+  url.hash = "";
+  url.searchParams.set("chapter", String(index + 1));
+  return url.toString();
+}
+
+function renderChapter({ scroll = false, historyMode = "" } = {}) {
   const index = state.chapter;
   const details = getChapterDetails(index);
+  const permalink = getChapterPermalink(index);
 
   elements.chapterNumber.textContent = `Chapter ${index + 1}`;
   elements.chapterTitle.textContent = chapters[index];
+  elements.chapterPermalink.href = permalink;
+  elements.chapterPermalink.setAttribute("aria-label", `Permalink to chapter ${index + 1}: ${chapters[index]}`);
+  const hasChapterUrl = new URL(window.location.href).searchParams.has("chapter") || Boolean(historyMode);
+  elements.canonicalLink.href = hasChapterUrl ? permalink : new URL(".", window.location.href).toString();
+  document.title = hasChapterUrl ? `${chapters[index]} | The Desire of Ages` : "The Desire of Ages | Ellen G. White";
+  if (historyMode === "push") {
+    window.history.pushState({ chapter: index + 1 }, "", permalink);
+  } else if (historyMode === "replace") {
+    window.history.replaceState({ chapter: index + 1 }, "", permalink);
+  }
   elements.chapterBody.innerHTML = `
     ${details.paragraphs
       .map(
@@ -369,7 +390,7 @@ function changeChapter(delta) {
   if (nextChapter < 0 || nextChapter >= chapters.length) return;
   state.chapter = nextChapter;
   state.pendingHighlight = "";
-  renderChapter({ scroll: true });
+  renderChapter({ scroll: true, historyMode: "push" });
 }
 
 function createTextMap(root) {
@@ -676,7 +697,7 @@ function changeAudioChapter(delta) {
   const nextChapter = state.audioChapter + delta;
   if (nextChapter < 0 || nextChapter >= chapters.length) return;
   state.chapter = nextChapter;
-  renderChapter({ scroll: true });
+  renderChapter({ scroll: true, historyMode: "push" });
   syncAudioChapter(nextChapter, true);
 }
 
@@ -699,7 +720,7 @@ elements.chapterList.addEventListener("click", (event) => {
   state.chapter = Number(button.dataset.chapter);
   state.pendingHighlight = button.dataset.highlight ? decodeURIComponent(button.dataset.highlight) : "";
   closeRail();
-  renderChapter({ scroll: true });
+  renderChapter({ scroll: true, historyMode: "push" });
 });
 
 elements.chapterSearch.addEventListener("input", (event) => renderChapterList(event.target.value));
@@ -753,7 +774,7 @@ document.querySelector("#startReadingButton").addEventListener("click", () => {
 });
 document.querySelector("#listenButton").addEventListener("click", () => {
   state.chapter = 0;
-  renderChapter({ scroll: true });
+  renderChapter({ scroll: true, historyMode: "push" });
   window.setTimeout(() => syncAudioChapter(0, true), 650);
 });
 document.querySelector("#searchButton").addEventListener("click", () => openRail(true));
@@ -775,6 +796,14 @@ document.addEventListener("keydown", (event) => {
 document.addEventListener("selectionchange", () => {
   window.clearTimeout(updateSelectionShare.timeout);
   updateSelectionShare.timeout = window.setTimeout(updateSelectionShare, 80);
+});
+
+window.addEventListener("popstate", () => {
+  const chapter = Number.parseInt(new URL(window.location.href).searchParams.get("chapter") || "1", 10);
+  if (!Number.isInteger(chapter) || chapter < 1 || chapter > chapters.length) return;
+  state.chapter = chapter - 1;
+  state.pendingHighlight = "";
+  renderChapter({ scroll: true });
 });
 
 const savedTheme = localStorage.getItem("da-theme");

@@ -9,6 +9,8 @@
     />
     <meta name="theme-color" content="#f5efe5" />
     <title>The Desire of Ages | Ellen G. White</title>
+    <link id="canonicalLink" rel="canonical" href="https://apopovski.github.io/desire-of-ages/" />
+    <link rel="sitemap" type="application/xml" href="sitemap.xml" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -62,6 +64,9 @@
         <circle cx="6" cy="12" r="2.5" />
         <circle cx="18" cy="19" r="2.5" />
         <path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5" />
+      </symbol>
+      <symbol id="icon-link" viewBox="0 0 24 24">
+        <path d="M10 13a5 5 0 0 0 7.07.07l2-2A5 5 0 0 0 12 4l-1.15 1.15M14 11a5 5 0 0 0-7.07-.07l-2 2A5 5 0 0 0 12 20l1.15-1.15" />
       </symbol>
     </svg>
 
@@ -172,7 +177,13 @@
           <div class="reader-progress" aria-hidden="true"><span id="progressBar"></span></div>
           <div class="reader-heading">
             <div>
-              <p class="chapter-number" id="chapterNumber">Chapter 1</p>
+              <div class="chapter-label">
+                <p class="chapter-number" id="chapterNumber">Chapter 1</p>
+                <a class="chapter-permalink" id="chapterPermalink" href="?chapter=1" aria-label="Permalink to chapter 1">
+                  <svg><use href="#icon-link"></use></svg>
+                  <span>Permalink</span>
+                </a>
+              </div>
               <h2 id="chapterTitle">“God With Us”</h2>
             </div>
             <button class="listen-control" id="readerListenButton" type="button">
