@@ -425,7 +425,7 @@ function createTextMap(root) {
 
 function highlightPassage(quote, paragraphId = "") {
   if (!quote) return false;
-  const normalizedQuote = quote.replace(/\s+/g, " ").trim();
+  const normalizedQuote = quote.replace(/\s+/g, " ").replace(/(\d) +(?=[;,]|\.(?!\.))/g, "$1").trim();
   const { normalized, positions } = createTextMap(elements.chapterBody);
   const matchIndex = normalized.toLowerCase().indexOf(normalizedQuote.toLowerCase());
   if (matchIndex < 0 || !positions[matchIndex]) {
@@ -776,6 +776,7 @@ elements.audioSeek.addEventListener("input", () => {
   elements.chapterAudio.currentTime = (Number(elements.audioSeek.value) / 1000) * duration;
 });
 elements.audioSpeed.addEventListener("change", () => {
+  elements.chapterAudio.defaultPlaybackRate = Number(elements.audioSpeed.value);
   elements.chapterAudio.playbackRate = Number(elements.audioSpeed.value);
   localStorage.setItem("da-audio-speed", elements.audioSpeed.value);
 });
@@ -837,6 +838,7 @@ const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
 const savedAudioSpeed = localStorage.getItem("da-audio-speed") || "1";
 const savedAudioCollapsed = localStorage.getItem("da-audio-collapsed") === "true";
 elements.audioSpeed.value = savedAudioSpeed;
+elements.chapterAudio.defaultPlaybackRate = Number(savedAudioSpeed);
 elements.chapterAudio.playbackRate = Number(savedAudioSpeed);
 setAudioCollapsed(savedAudioCollapsed, false);
 setTheme(savedTheme ? savedTheme === "dark" : prefersDark);

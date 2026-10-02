@@ -24,4 +24,7 @@ Then open `http://localhost:4173`.
 ## Sources
 
 - Book text: [EGW Writings](https://text.egwwritings.org/book/b130)
-- Public-domain audiobook: [LibriVox via Internet Archive](https://archive.org/details/TheDesireOfAges)
+- Audiobook narrated by Mike McCabe: [Ellen White Audio](https://ellenwhiteaudio.org/desire-of-ages/). Used with permission from Uriel, as confirmed by the client.
+- Homepage card artwork: supplied by the client.
+
+Imported text has been normalized to remove extra spaces before punctuation following verse numbers (for example, `Psalm 65:6; 95:5.`). Wording, ellipses, and page/paragraph identifiers are unchanged.
